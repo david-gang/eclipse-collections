@@ -14,12 +14,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.DoubleSummaryStatistics;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IntSummaryStatistics;
 import java.util.Iterator;
 import java.util.List;
 import java.util.LongSummaryStatistics;
+import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -50,6 +53,7 @@ import org.eclipse.collections.api.collection.primitive.MutableFloatCollection;
 import org.eclipse.collections.api.collection.primitive.MutableIntCollection;
 import org.eclipse.collections.api.collection.primitive.MutableLongCollection;
 import org.eclipse.collections.api.collection.primitive.MutableShortCollection;
+import org.eclipse.collections.api.factory.Maps;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.map.MapIterable;
 import org.eclipse.collections.api.map.MutableMap;
@@ -616,9 +620,39 @@ public abstract class AbstractRichIterableTestCase
     }
 
     @Test
+    public void minOptional()
+    {
+        Assert.assertEquals(
+                Integer.valueOf(1),
+                this.newWith(1, 3, 2).minOptional().get());
+        Assert.assertEquals(
+                Integer.valueOf(1),
+                this.newWith(1, 3, 2).minOptional(Integer::compareTo).get());
+        Assert.assertFalse(
+                this.<Integer>newWith().minOptional().isPresent());
+        Assert.assertFalse(
+                this.<Integer>newWith().minOptional(Integer::compareTo).isPresent());
+    }
+
+    @Test
     public void max()
     {
         Assert.assertEquals(Integer.valueOf(3), this.newWith(1, 3, 2).max(Integer::compareTo));
+    }
+
+    @Test
+    public void maxOptional()
+    {
+        Assert.assertEquals(
+                Integer.valueOf(3),
+                this.newWith(1, 3, 2).maxOptional().get());
+        Assert.assertEquals(
+                Integer.valueOf(3),
+                this.newWith(1, 3, 2).maxOptional(Integer::compareTo).get());
+        Assert.assertFalse(
+                this.<Integer>newWith().maxOptional().isPresent());
+        Assert.assertFalse(
+                this.<Integer>newWith().maxOptional(Integer::compareTo).isPresent());
     }
 
     @Test(expected = NullPointerException.class)
@@ -1335,6 +1369,21 @@ public abstract class AbstractRichIterableTestCase
     }
 
     @Test
+    public void toMapTarget()
+    {
+        RichIterable<Integer> integers = this.newWith(1, 2, 3, 4);
+        Map<String, String> jdkMap = new HashMap<>();
+        jdkMap.put("1", "1");
+        jdkMap.put("2", "2");
+        jdkMap.put("3", "3");
+        jdkMap.put("4", "4");
+        Map<String, String> targetMap =
+                integers.toMap(Object::toString, Object::toString, new HashMap<>());
+        Assert.assertEquals(jdkMap, targetMap);
+        Assert.assertTrue(targetMap instanceof HashMap);
+    }
+
+    @Test
     public void toSortedMap()
     {
         RichIterable<Integer> integers = this.newWith(1, 2, 3);
@@ -1361,6 +1410,26 @@ public abstract class AbstractRichIterableTestCase
                 Functions.getIntegerPassThru(), Object::toString);
         Verify.assertMapsEqual(TreeSortedMap.newMapWith(Comparators.reverseNaturalOrder(), 1, "1", 2, "2", 3, "3"), map);
         Verify.assertListsEqual(Lists.mutable.with(3, 2, 1), map.keySet().toList());
+    }
+
+    @Test
+    public void toBiMap()
+    {
+        RichIterable<Integer> integers = this.newWith(1, 2, 3);
+
+        Assert.assertEquals(
+                Maps.mutable.with("1", "1", "2", "2", "3", "3"),
+                integers.toBiMap(Object::toString, Object::toString));
+
+        Verify.assertThrows(
+                IllegalArgumentException.class,
+                () -> integers.toBiMap(i -> "Constant Key", Objects::toString));
+        Verify.assertThrows(
+                IllegalArgumentException.class,
+                () -> integers.toBiMap(Object::toString, i -> "Constant Value"));
+        Verify.assertThrows(
+                IllegalArgumentException.class,
+                () -> integers.toBiMap(i -> "Constant Key", i -> "Constant Value"));
     }
 
     @Test

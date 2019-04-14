@@ -15,12 +15,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Optional;
 
 import org.eclipse.collections.api.LazyIterable;
 import org.eclipse.collections.api.RichIterable;
 import org.eclipse.collections.api.bag.MutableBag;
 import org.eclipse.collections.api.bag.sorted.MutableSortedBag;
+import org.eclipse.collections.api.bimap.MutableBiMap;
 import org.eclipse.collections.api.block.function.Function;
 import org.eclipse.collections.api.block.function.Function0;
 import org.eclipse.collections.api.block.function.Function2;
@@ -964,6 +966,15 @@ public final class SynchronizedStack<T> implements MutableStack<T>, Serializable
     }
 
     @Override
+    public <NK, NV, R extends Map<NK, NV>> R toMap(Function<? super T, ? extends NK> keyFunction, Function<? super T, ? extends NV> valueFunction, R target)
+    {
+        synchronized (this.lock)
+        {
+            return this.delegate.toMap(keyFunction, valueFunction, target);
+        }
+    }
+
+    @Override
     public <NK, NV> MutableSortedMap<NK, NV> toSortedMap(Function<? super T, ? extends NK> keyFunction, Function<? super T, ? extends NV> valueFunction)
     {
         synchronized (this.lock)
@@ -987,6 +998,15 @@ public final class SynchronizedStack<T> implements MutableStack<T>, Serializable
         synchronized (this.lock)
         {
             return this.delegate.toSortedMapBy(sortBy, keyFunction, valueFunction);
+        }
+    }
+
+    @Override
+    public <NK, NV> MutableBiMap<NK, NV> toBiMap(Function<? super T, ? extends NK> keyFunction, Function<? super T, ? extends NV> valueFunction)
+    {
+        synchronized (this.lock)
+        {
+            return this.delegate.toBiMap(keyFunction, valueFunction);
         }
     }
 

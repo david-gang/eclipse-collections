@@ -37,6 +37,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -55,6 +56,7 @@ import org.eclipse.collections.api.bag.primitive.ImmutableIntBag;
 import org.eclipse.collections.api.bag.primitive.ImmutableLongBag;
 import org.eclipse.collections.api.bag.primitive.ImmutableShortBag;
 import org.eclipse.collections.api.bag.sorted.MutableSortedBag;
+import org.eclipse.collections.api.bimap.MutableBiMap;
 import org.eclipse.collections.api.block.function.Function;
 import org.eclipse.collections.api.block.function.Function0;
 import org.eclipse.collections.api.block.function.Function2;
@@ -108,6 +110,7 @@ import org.eclipse.collections.api.tuple.primitive.<name>ObjectPair;
 import org.eclipse.collections.impl.bag.sorted.mutable.TreeBag;
 import org.eclipse.collections.impl.block.factory.Comparators;
 import org.eclipse.collections.impl.factory.Bags;
+import org.eclipse.collections.impl.factory.BiMaps;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
 import org.eclipse.collections.impl.factory.Multimaps;
@@ -567,6 +570,12 @@ final class Immutable<name>ObjectEmptyMap\<V> implements Immutable<name>ObjectMa
     }
 
     @Override
+    public \<NK, NV, R extends Map\<NK, NV>\> R toMap(Function\<? super V, ? extends NK> keyFunction, Function\<? super V, ? extends NV> valueFunction, R target)
+    {
+        return target;
+    }
+
+    @Override
     public \<NK, NV> MutableSortedMap\<NK, NV> toSortedMap(Function\<? super V, ? extends NK> keyFunction, Function\<? super V, ? extends NV> valueFunction)
     {
         return SortedMaps.mutable.with();
@@ -582,6 +591,12 @@ final class Immutable<name>ObjectEmptyMap\<V> implements Immutable<name>ObjectMa
     public \<KK extends Comparable\<? super KK>, NK, NV> MutableSortedMap\<NK, NV> toSortedMapBy(Function\<? super NK, KK> sortBy, Function\<? super V, ? extends NK> keyFunction, Function\<? super V, ? extends NV> valueFunction)
     {
         return SortedMaps.mutable.with();
+    }
+
+    @Override
+    public \<NK, NV> MutableBiMap\<NK, NV> toBiMap(Function\<? super V, ? extends NK> keyFunction, Function\<? super V, ? extends NV> valueFunction)
+    {
+        return BiMaps.mutable.empty();
     }
 
     @Override

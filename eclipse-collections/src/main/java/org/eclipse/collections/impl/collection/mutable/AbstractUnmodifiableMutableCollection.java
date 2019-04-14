@@ -13,12 +13,14 @@ package org.eclipse.collections.impl.collection.mutable;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Optional;
 
 import org.eclipse.collections.api.LazyIterable;
 import org.eclipse.collections.api.RichIterable;
 import org.eclipse.collections.api.bag.MutableBag;
 import org.eclipse.collections.api.bag.sorted.MutableSortedBag;
+import org.eclipse.collections.api.bimap.MutableBiMap;
 import org.eclipse.collections.api.block.function.Function;
 import org.eclipse.collections.api.block.function.Function0;
 import org.eclipse.collections.api.block.function.Function2;
@@ -828,6 +830,15 @@ public class AbstractUnmodifiableMutableCollection<T> implements MutableCollecti
     }
 
     @Override
+    public <NK, NV, R extends Map<NK, NV>> R toMap(
+            Function<? super T, ? extends NK> keyFunction,
+            Function<? super T, ? extends NV> valueFunction,
+            R target)
+    {
+        return this.getMutableCollection().toMap(keyFunction, valueFunction, target);
+    }
+
+    @Override
     public <NK, NV> MutableSortedMap<NK, NV> toSortedMap(
             Function<? super T, ? extends NK> keyFunction,
             Function<? super T, ? extends NV> valueFunction)
@@ -851,6 +862,12 @@ public class AbstractUnmodifiableMutableCollection<T> implements MutableCollecti
             Function<? super T, ? extends NV> valueFunction)
     {
         return this.getMutableCollection().toSortedMapBy(sortBy, keyFunction, valueFunction);
+    }
+
+    @Override
+    public <NK, NV> MutableBiMap<NK, NV> toBiMap(Function<? super T, ? extends NK> keyFunction, Function<? super T, ? extends NV> valueFunction)
+    {
+        return this.getMutableCollection().toBiMap(keyFunction, valueFunction);
     }
 
     @Override

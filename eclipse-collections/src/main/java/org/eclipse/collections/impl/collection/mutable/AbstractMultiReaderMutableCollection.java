@@ -13,6 +13,7 @@ package org.eclipse.collections.impl.collection.mutable;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Spliterator;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -22,6 +23,7 @@ import org.eclipse.collections.api.LazyIterable;
 import org.eclipse.collections.api.RichIterable;
 import org.eclipse.collections.api.bag.MutableBag;
 import org.eclipse.collections.api.bag.sorted.MutableSortedBag;
+import org.eclipse.collections.api.bimap.MutableBiMap;
 import org.eclipse.collections.api.block.function.Function;
 import org.eclipse.collections.api.block.function.Function0;
 import org.eclipse.collections.api.block.function.Function2;
@@ -304,6 +306,23 @@ public abstract class AbstractMultiReaderMutableCollection<T> implements Mutable
     }
 
     @Override
+    public <K, V, R extends Map<K, V>> R toMap(
+            Function<? super T, ? extends K> keyFunction,
+            Function<? super T, ? extends V> valueFunction,
+            R target)
+    {
+        this.acquireReadLock();
+        try
+        {
+            return this.getDelegate().toMap(keyFunction, valueFunction, target);
+        }
+        finally
+        {
+            this.unlockReadLock();
+        }
+    }
+
+    @Override
     public <NK, NV> MutableSortedMap<NK, NV> toSortedMap(
             Function<? super T, ? extends NK> keyFunction,
             Function<? super T, ? extends NV> valueFunction)
@@ -346,6 +365,22 @@ public abstract class AbstractMultiReaderMutableCollection<T> implements Mutable
         try
         {
             return this.getDelegate().toSortedMapBy(sortBy, keyFunction, valueFunction);
+        }
+        finally
+        {
+            this.unlockReadLock();
+        }
+    }
+
+    @Override
+    public <NK, NV> MutableBiMap<NK, NV> toBiMap(
+            Function<? super T, ? extends NK> keyFunction,
+            Function<? super T, ? extends NV> valueFunction)
+    {
+        this.acquireReadLock();
+        try
+        {
+            return this.getDelegate().toBiMap(keyFunction, valueFunction);
         }
         finally
         {
@@ -1895,6 +1930,15 @@ public abstract class AbstractMultiReaderMutableCollection<T> implements Mutable
         }
 
         @Override
+        public <NK, NV, R extends Map<NK, NV>> R toMap(
+                Function<? super T, ? extends NK> keyFunction,
+                Function<? super T, ? extends NV> valueFunction,
+                R target)
+        {
+            return this.delegate.toMap(keyFunction, valueFunction, target);
+        }
+
+        @Override
         public <NK, NV> MutableSortedMap<NK, NV> toSortedMap(
                 Function<? super T, ? extends NK> keyFunction,
                 Function<? super T, ? extends NV> valueFunction)
@@ -1918,6 +1962,14 @@ public abstract class AbstractMultiReaderMutableCollection<T> implements Mutable
                 Function<? super T, ? extends NV> valueFunction)
         {
             return this.delegate.toSortedMapBy(sortBy, keyFunction, valueFunction);
+        }
+
+        @Override
+        public <NK, NV> MutableBiMap<NK, NV> toBiMap(
+                Function<? super T, ? extends NK> keyFunction,
+                Function<? super T, ? extends NV> valueFunction)
+        {
+            return this.delegate.toBiMap(keyFunction, valueFunction);
         }
 
         @Override

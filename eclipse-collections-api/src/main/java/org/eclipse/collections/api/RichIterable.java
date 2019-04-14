@@ -15,6 +15,7 @@ import java.util.Comparator;
 import java.util.DoubleSummaryStatistics;
 import java.util.IntSummaryStatistics;
 import java.util.LongSummaryStatistics;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.BiConsumer;
@@ -27,6 +28,7 @@ import org.eclipse.collections.api.bag.Bag;
 import org.eclipse.collections.api.bag.MutableBag;
 import org.eclipse.collections.api.bag.MutableBagIterable;
 import org.eclipse.collections.api.bag.sorted.MutableSortedBag;
+import org.eclipse.collections.api.bimap.MutableBiMap;
 import org.eclipse.collections.api.block.function.Function;
 import org.eclipse.collections.api.block.function.Function0;
 import org.eclipse.collections.api.block.function.Function2;
@@ -1557,6 +1559,21 @@ public interface RichIterable<T>
             Function<? super T, ? extends NV> valueFunction);
 
     /**
+     * Same as {@link #toMap(Function, Function)}, except that the results are gathered into the specified {@code target}
+     * map.
+     *
+     * @since 10.0
+     */
+    default <NK, NV, R extends Map<NK, NV>> R toMap(
+            Function<? super T, ? extends NK> keyFunction,
+            Function<? super T, ? extends NV> valueFunction,
+            R target)
+    {
+        this.forEach(each -> target.put(keyFunction.apply(each), valueFunction.apply(each)));
+        return target;
+    }
+
+    /**
      * Converts the collection to a MutableSortedMap implementation using the specified key and value functions
      * sorted by the key elements' natural ordering.
      *
@@ -1588,6 +1605,15 @@ public interface RichIterable<T>
     {
         return this.toSortedMap(Comparator.comparing(sortBy), keyFunction, valueFunction);
     }
+
+    /**
+     * Converts the collection to a BiMap implementation using the specified key and value functions.
+     *
+     * @since 10.0
+     */
+    <NK, NV> MutableBiMap<NK, NV> toBiMap(
+            Function<? super T, ? extends NK> keyFunction,
+            Function<? super T, ? extends NV> valueFunction);
 
     /**
      * Returns a lazy (deferred) iterable, most likely implemented by calling LazyIterate.adapt(this).
